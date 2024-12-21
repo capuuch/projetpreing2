@@ -64,8 +64,34 @@ if [[ ! -f "codeC/cwire" ]]; then
   fi
 fi
 
+# Préparer les fichiers 
+tmp="./tmp"
 
+if [[ -d "$tmp" ]]; then
+    rm -rf "$tmp"
+fi
+mkdir -p "$tmp"
 
+# Mesurer le temps de traitement
+temps_debut=$(date +%s.%N)
+
+# Appeler le programme C pour traiter les données
+echo "Lancement du traitement avec le programme C..."
+./codeC/cwire "$cheminfichier" "$typestation" "$typeconsommateur" > "$tmp/output.csv"
+if [[ $? -ne 0 ]]; then
+    echo "Erreur : Le traitement des données a échoué."
+    temps_fin=$(date +%s.%N)
+    duree=$(echo "$temps_fin - $temps_debut" | bc)
+    echo "Durée du traitement : ${duree}s"
+    exit 7
+fi
+
+# Fin du traitement
+temps_fin=$(date +%s.%N)
+duree=$(echo "$temps_fin - $temps_debut" | bc)
+echo "Durée du traitement : ${duree}s"
+
+echo "Le traitement est terminé. Les résultats se trouvent dans le dossier '$tmp'."
 
 
 
